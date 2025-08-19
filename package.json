@@ -1,17 +1,26 @@
 {
-  "name": "node-cicd-cloudrun",
+  "name": "complementaria",
   "version": "1.0.0",
+  "description": "API Node CI/CD a Render con pruebas y Docker",
   "main": "src/index.js",
-  "type": "commonjs",
   "scripts": {
     "start": "node src/index.js",
     "test": "jest --runInBand"
   },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.19.2"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "supertest": "^7.1.4"
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
