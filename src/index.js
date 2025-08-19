@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Hello World from CI/CD pipeline' });
+  res.json({ message: 'Hello World from CI/CD pipeline xd' });
 });
 
 app.get('/health', (req, res) => {
