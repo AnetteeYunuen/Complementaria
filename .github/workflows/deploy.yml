@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: render-${{ github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Test (Jest)
@@ -16,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
       - name: Install deps
         run: npm ci
@@ -31,24 +35,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/production'
+    # Hacemos visibles secretos como env del job (para poder usarlos en if/env)
+    env:
+      RENDER_SERVICE_URL: ${{ secrets.RENDER_SERVICE_URL }}
     steps:
-      - name: Trigger Deploy via Render Deploy Hook
+      - name: Trigger via Deploy Hook
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
           if [ -z "$RENDER_DEPLOY_HOOK" ]; then
-            echo "Missing RENDER_DEPLOY_HOOK secret" && exit 1
+            echo "❌ Falta el secreto RENDER_DEPLOY_HOOK"; exit 1
           fi
-          echo "Triggering deploy on Render..."
+          echo "🚀 Disparando deploy en Render..."
           curl -fsSL -X POST "$RENDER_DEPLOY_HOOK"
 
       - name: Smoke test (optional)
-        if: ${{ secrets.RENDER_SERVICE_URL != '' }}
+        if: ${{ env.RENDER_SERVICE_URL != '' }}
         env:
-          URL: ${{ secrets.RENDER_SERVICE_URL }}
+          URL: ${{ env.RENDER_SERVICE_URL }}
         run: |
-          echo "Waiting for Render to roll out..."
+          echo "⏳ Esperando a que Render aplique el deploy..."
           sleep 40
-          echo "Hitting $URL/health"
+          echo "🔎 GET $URL/health"
           curl -f "$URL/health"
-          echo "✅ Deployment looks healthy"
+          echo "✅ Deployment healthy"
