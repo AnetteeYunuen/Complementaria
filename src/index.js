@@ -1,14 +1,21 @@
+// src/index.js
 const express = require('express');
 const app = express();
 
-app.get('/', (_req, res) => {
-  res.json({ message: 'Hello from Node.js CI/CD on Cloud Run' });
+app.get('/', (req, res) => {
+  res.json({ message: 'Hello World from CI/CD pipeline' });
 });
 
-// Salud opcional para monitoreo
-app.get('/health', (_req, res) => res.status(200).send('ok'));
+app.get('/health', (req, res) => {
+  res.status(200).send('ok');
+});
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`API listening on ${PORT}`));
+module.exports = app;
 
-module.exports = app; // export para pruebas
+// Arrancar servidor SOLO si se ejecuta directamente y no es test
+if (require.main === module && process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 8080; // Render inyecta PORT
+  app.listen(PORT, () => {
+    console.log(`API listening on ${PORT}`);
+  });
+}
